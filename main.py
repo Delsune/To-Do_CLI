@@ -1,3 +1,7 @@
+import os
+import textwrap
+
+
 MENU = ("===============================\n"
         + "|   Command-Line To-Do List   |\n"
         + "|  *please make a selection*  |\n"
@@ -11,6 +15,12 @@ tasks = []
 in_progress = True
 
 
+def text_wrapper(text):
+    terminal_width = os.get_terminal_size().columns - 4
+    wrapper = textwrap.TextWrapper(width=terminal_width)
+    print("".join(wrapper.wrap(text)))
+
+
 def task_editing():
     try:
         amount = int(input("How many tasks? "))
@@ -18,7 +28,8 @@ def task_editing():
         print("That is not an integer.")
         exit()
 
-    mode = input("Adding or Removing? ").lower().strip()
+    mode = input("Adding or Removing? "
+                 + "(Type 'Remove All' to empty your list) ").lower().strip()
 
     match mode:
         case "adding":
@@ -34,10 +45,15 @@ def task_editing():
             try:
                 for i in range(amount):
                     tasks.remove(input().strip() + "\n")
+
             except ValueError:
                 print("Could not remove something that doesn't exist in "
                       + "the list, please restart the app.")
                 exit()
+
+        case "remove all":
+            print("Emptied task list.")
+            tasks.clear()
 
         case _:
             print("That is not an option, please restart the app.")
@@ -57,6 +73,15 @@ def is_finished():
         case _:
             print("That is not an option, defaulting to completed.")
             exit()
+
+
+def view():
+    print("="*200)
+
+    for i in range(len(tasks)):
+        text_wrapper("Task " + str(int(i)+1) + " - " + tasks[i])
+
+    print("="*200)
 
 
 while in_progress:
@@ -88,5 +113,5 @@ while in_progress:
             is_finished()
 
         case 4:
-            print(tasks)
+            view()
             is_finished()
